@@ -22,13 +22,37 @@ default_temperature = 0.7
 port = 8080
 host = "0.0.0.0"
 allow_public_bind = true
+
+[channels_config.telegram]
+bot_token = "${TELEGRAM_BOT_TOKEN:-}"
+allowed_users = ["vinscyber"]
+
+[[channels]]
+channel_type = "telegram"
 TOML
     echo "Config created at $CONFIG_FILE"
 else
     echo "Config already exists, preserving existing configuration."
-    # Update API_KEY from env var if set (allows changing key without losing config)
+    # Update API_KEY from env var if set
     if [ -n "$API_KEY" ]; then
         sed -i "s|^api_key = .*|api_key = \"${API_KEY}\"|" "$CONFIG_FILE"
+    fi
+    # Update Telegram bot token from env var if set
+    if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
+        sed -i "s|^bot_token = .*|bot_token = \"${TELEGRAM_BOT_TOKEN}\"|" "$CONFIG_FILE"
+    fi
+    # Add Telegram config if not present
+    if ! grep -q "channels_config.telegram" "$CONFIG_FILE"; then
+        cat >> "$CONFIG_FILE" <<TOML
+
+[channels_config.telegram]
+bot_token = "${TELEGRAM_BOT_TOKEN:-}"
+allowed_users = ["vinscyber"]
+
+[[channels]]
+channel_type = "telegram"
+TOML
+        echo "Telegram channel added to config."
     fi
 fi
 
