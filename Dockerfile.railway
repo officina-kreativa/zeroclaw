@@ -1,105 +1,56 @@
-# Railway-compatible Dockerfile (no BuildKit cache mounts)
-# Based on upstream Dockerfile, adapted for Railway's build system.
+# Railway deployment Dockerfile for ZeroClaw
+# Based on razrinn/zeroclaw-railway-template, adapted for fork-based builds.
 
-# ── Stage 1: Build ────────────────────────────────────────────
+# ── Stage 1: Build from fork source ────────────────────────────
 FROM rust:1.93-slim AS builder
 
-WORKDIR /app
-ARG ZEROCLAW_CARGO_FEATURES=""
+WORKDIR /src
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
-        pkg-config \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# 1. Copy manifests to cache dependencies
-COPY Cargo.toml Cargo.lock ./
-COPY build.rs build.rs
-COPY crates/robot-kit/Cargo.toml crates/robot-kit/Cargo.toml
-COPY crates/zeroclaw-types/Cargo.toml crates/zeroclaw-types/Cargo.toml
-COPY crates/zeroclaw-core/Cargo.toml crates/zeroclaw-core/Cargo.toml
-# Create dummy targets declared in Cargo.toml so manifest parsing succeeds.
-RUN mkdir -p src benches crates/robot-kit/src crates/zeroclaw-types/src crates/zeroclaw-core/src \
-    && echo "fn main() {}" > src/main.rs \
-    && echo "fn main() {}" > benches/agent_benchmarks.rs \
-    && echo "pub fn placeholder() {}" > crates/robot-kit/src/lib.rs \
-    && echo "pub fn placeholder() {}" > crates/zeroclaw-types/src/lib.rs \
-    && echo "pub fn placeholder() {}" > crates/zeroclaw-core/src/lib.rs
-RUN if [ -n "$ZEROCLAW_CARGO_FEATURES" ]; then \
-      cargo build --release --features "$ZEROCLAW_CARGO_FEATURES"; \
-    else \
-      cargo build --release --locked; \
-    fi
-RUN rm -rf src benches crates/robot-kit/src crates/zeroclaw-types/src crates/zeroclaw-core/src
-
-# 2. Copy only build-relevant source paths
+# Copy source from fork (not cloned from GitHub)
+COPY Cargo.toml Cargo.lock build.rs ./
+COPY crates/ crates/
 COPY src/ src/
 COPY benches/ benches/
-COPY crates/ crates/
 COPY firmware/ firmware/
 COPY templates/ templates/
 COPY web/ web/
-# Keep release builds resilient when frontend dist assets are not prebuilt in Git.
-RUN mkdir -p web/dist && \
-    if [ ! -f web/dist/index.html ]; then \
-      printf '%s\n' \
-        '<!doctype html>' \
-        '<html lang="en">' \
-        '  <head>' \
-        '    <meta charset="utf-8" />' \
-        '    <meta name="viewport" content="width=device-width,initial-scale=1" />' \
-        '    <title>ZeroClaw Dashboard</title>' \
-        '  </head>' \
-        '  <body>' \
-        '    <h1>ZeroClaw Dashboard Unavailable</h1>' \
-        '    <p>Frontend assets are not bundled in this build. Build the web UI to populate <code>web/dist</code>.</p>' \
-        '  </body>' \
-        '</html>' > web/dist/index.html; \
-    fi
-RUN if [ -n "$ZEROCLAW_CARGO_FEATURES" ]; then \
-      cargo build --release --features "$ZEROCLAW_CARGO_FEATURES"; \
-    else \
-      cargo build --release --locked; \
-    fi && \
-    cp target/release/zeroclaw /app/zeroclaw && \
-    strip /app/zeroclaw
 
-# Prepare runtime directory structure and default config
-RUN mkdir -p /zeroclaw-data/.zeroclaw /zeroclaw-data/workspace && \
-    cat > /zeroclaw-data/.zeroclaw/config.toml <<EOF && \
-    chown -R 65534:65534 /zeroclaw-data
-workspace_dir = "/zeroclaw-data/workspace"
-config_path = "/zeroclaw-data/.zeroclaw/config.toml"
-api_key = ""
-api_url = "https://ollama.com"
-default_provider = "ollama"
-default_model = "qwen3-coder-next:cloud"
-default_temperature = 0.7
+# Build ZeroClaw in release mode
+RUN cargo build --release --locked
 
-[gateway]
-port = 42617
-host = "0.0.0.0"
-allow_public_bind = true
-EOF
+# Strip binary for smaller size
+RUN strip target/release/zeroclaw
 
-# ── Stage 2: Production Runtime (Debian slim) ────────────────
-# Using debian-slim instead of distroless for Railway compatibility
-FROM debian:trixie-slim AS release
+# ── Stage 2: Runtime ───────────────────────────────────────────
+FROM debian:trixie-slim
 
+# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
+    curl \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/zeroclaw /usr/local/bin/zeroclaw
-COPY --from=builder /zeroclaw-data /zeroclaw-data
+# Copy ZeroClaw binary from builder
+COPY --from=builder /src/target/release/zeroclaw /usr/local/bin/zeroclaw
 
-# Environment setup
-ENV ZEROCLAW_WORKSPACE=/zeroclaw-data/workspace
-ENV HOME=/zeroclaw-data
-ENV ZEROCLAW_GATEWAY_PORT=42617
+# Create data directory for persistent storage (Railway volume mount)
+RUN mkdir -p /data/.zeroclaw /data/workspace
 
-WORKDIR /zeroclaw-data
-USER 65534:65534
-EXPOSE 42617
-ENTRYPOINT ["zeroclaw"]
-CMD ["gateway"]
+# Copy startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+# Set environment - HOME=/data makes ZeroClaw use /data/.zeroclaw
+ENV HOME=/data
+ENV ZEROCLAW_WORKSPACE=/data/workspace
+ENV SHELL=/bin/bash
+
+WORKDIR /data
+
+CMD ["/app/start.sh"]
