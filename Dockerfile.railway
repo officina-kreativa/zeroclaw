@@ -20,6 +20,17 @@ COPY firmware/ firmware/
 COPY templates/ templates/
 COPY web/ web/
 
+# Ensure web/dist exists (required by RustEmbed at compile time)
+RUN mkdir -p web/dist && \
+    if [ ! -f web/dist/index.html ]; then \
+      printf '%s\n' \
+        '<!doctype html>' \
+        '<html lang="en">' \
+        '  <head><meta charset="utf-8" /><title>ZeroClaw</title></head>' \
+        '  <body><h1>ZeroClaw Dashboard</h1><p>Frontend assets not bundled.</p></body>' \
+        '</html>' > web/dist/index.html; \
+    fi
+
 # Build ZeroClaw in release mode
 RUN cargo build --release --locked
 
