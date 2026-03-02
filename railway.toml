@@ -1,6 +1,5 @@
 [build]
-dockerfilePath = "Dockerfile"
-# Use the production (distroless) stage
+dockerfilePath = "Dockerfile.railway"
 buildTarget = "release"
 
 [deploy]
