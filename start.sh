@@ -23,6 +23,11 @@ port = 8080
 host = "0.0.0.0"
 allow_public_bind = true
 
+[agent]
+agentic = true
+allowed_tools = ["web_search", "file_read", "shell"]
+max_iterations = 5
+
 [agent.session]
 backend = "sqlite"
 strategy = "per-sender"
@@ -44,11 +49,6 @@ provider = "tavily"
 api_key = "${TAVILY_API_KEY:-}"
 fallback_providers = ["duckduckgo"]
 max_results = 5
-
-[agent]
-agentic = true
-allowed_tools = ["web_search", "file_read", "shell"]
-max_iterations = 5
 
 [research]
 enabled = true
@@ -67,21 +67,57 @@ TOML
     echo "Config created at $CONFIG_FILE"
 else
     echo "Config already exists, preserving existing configuration."
-    # Update API_KEY from env var if set
+
+    # Update secrets from env vars
     if [ -n "$API_KEY" ]; then
         sed -i "s|^api_key = .*|api_key = \"${API_KEY}\"|" "$CONFIG_FILE"
     fi
-    # Update Telegram bot token from env var if set
     if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
         sed -i "s|^bot_token = .*|bot_token = \"${TELEGRAM_BOT_TOKEN}\"|" "$CONFIG_FILE"
     fi
-    # Update Tavily API key from env var if set
     if [ -n "$TAVILY_API_KEY" ]; then
-        sed -i "s|^api_key = \"tvly-.*\"|api_key = \"${TAVILY_API_KEY}\"|" "$CONFIG_FILE"
+        sed -i "s|^api_key = \"tvly-[^\"]*\"|api_key = \"${TAVILY_API_KEY}\"|" "$CONFIG_FILE"
     fi
-    # Add [agent.session] config if not present (enables persistent sessions)
+
+    # Fix duplicate [agent] section caused by earlier upgrade path bug:
+    # [agent.session] implicitly defines [agent], so a second [agent] block is invalid TOML.
+    # Remove the standalone [agent] block (with agentic/allowed_tools/max_iterations)
+    # and instead insert those keys before [agent.session] where they belong.
+    python3 - <<'PY'
+import re, os
+
+path = "/data/.zeroclaw/config.toml"
+with open(path) as f:
+    content = f.read()
+
+# Remove standalone [agent] block that was incorrectly appended
+# (matches [agent] followed by agentic/allowed_tools/max_iterations lines up to next section)
+content = re.sub(
+    r'\n\[agent\]\nagentic = true\n[^\[]*',
+    '\n',
+    content
+)
+
+# Add agentic keys before [agent.session] if not already present
+if 'agentic = true' not in content and '[agent.session]' in content:
+    content = content.replace(
+        '[agent.session]',
+        '[agent]\nagentic = true\nallowed_tools = ["web_search", "file_read", "shell"]\nmax_iterations = 5\n\n[agent.session]'
+    )
+    print("Agentic mode injected before [agent.session].")
+
+with open(path, 'w') as f:
+    f.write(content)
+PY
+
+    # Add [agent.session] if not present
     if ! grep -q "\[agent.session\]" "$CONFIG_FILE"; then
         cat >> "$CONFIG_FILE" <<TOML
+
+[agent]
+agentic = true
+allowed_tools = ["web_search", "file_read", "shell"]
+max_iterations = 5
 
 [agent.session]
 backend = "sqlite"
@@ -96,7 +132,7 @@ TOML
         echo "Session persistence (sqlite) added to config."
     fi
 
-    # Add [skills] config if not present
+    # Add [skills] if not present
     if ! grep -q "\[skills\]" "$CONFIG_FILE"; then
         cat >> "$CONFIG_FILE" <<TOML
 
@@ -108,7 +144,7 @@ TOML
         echo "Skills config added."
     fi
 
-    # Add [web_search] config if not present
+    # Add [web_search] if not present
     if ! grep -q "\[web_search\]" "$CONFIG_FILE"; then
         cat >> "$CONFIG_FILE" <<TOML
 
@@ -122,14 +158,9 @@ TOML
         echo "Web search (tavily) added to config."
     fi
 
-    # Add [agent] agentic mode if not present
-    if ! grep -q "agentic = true" "$CONFIG_FILE"; then
+    # Add [research] if not present
+    if ! grep -q "\[research\]" "$CONFIG_FILE"; then
         cat >> "$CONFIG_FILE" <<TOML
-
-[agent]
-agentic = true
-allowed_tools = ["web_search", "file_read", "shell"]
-max_iterations = 5
 
 [research]
 enabled = true
@@ -138,7 +169,7 @@ keywords = ["search", "find", "cerca", "look up", "what is", "who is", "how is",
 max_iterations = 3
 show_progress = true
 TOML
-        echo "Agentic mode + research phase added to config."
+        echo "Research phase added to config."
     fi
 
     # Add Telegram config if not present
