@@ -44,8 +44,22 @@ FROM debian:trixie-slim
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     curl \
+    git \
+    jq \
+    nodejs \
+    npm \
     procps \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+# agent-browser: headless browser CLI for AI agents
+# Chromium is NOT downloaded here — agent-browser install runs at first boot
+# onto the persistent /data volume to keep the image lean
+RUN npm install -g agent-browser
+
+# Python scraping stack
+RUN pip3 install --break-system-packages scrapy requests beautifulsoup4
 
 # Copy ZeroClaw binary from builder
 COPY --from=builder /src/target/release/zeroclaw /usr/local/bin/zeroclaw

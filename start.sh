@@ -23,6 +23,11 @@ port = 8080
 host = "0.0.0.0"
 allow_public_bind = true
 
+[skills]
+open_skills_enabled = true
+allow_scripts = false
+prompt_injection_mode = "full"
+
 [channels_config.telegram]
 bot_token = "${TELEGRAM_BOT_TOKEN:-}"
 allowed_users = ["vinscyber"]
@@ -41,6 +46,18 @@ else
     if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
         sed -i "s|^bot_token = .*|bot_token = \"${TELEGRAM_BOT_TOKEN}\"|" "$CONFIG_FILE"
     fi
+    # Add [skills] config if not present
+    if ! grep -q "\[skills\]" "$CONFIG_FILE"; then
+        cat >> "$CONFIG_FILE" <<TOML
+
+[skills]
+open_skills_enabled = true
+allow_scripts = false
+prompt_injection_mode = "full"
+TOML
+        echo "Skills config added."
+    fi
+
     # Add Telegram config if not present
     if ! grep -q "channels_config.telegram" "$CONFIG_FILE"; then
         cat >> "$CONFIG_FILE" <<TOML
@@ -54,6 +71,15 @@ channel_type = "telegram"
 TOML
         echo "Telegram channel added to config."
     fi
+fi
+
+# Install Chromium for agent-browser (one-time, persisted on /data volume)
+PLAYWRIGHT_CACHE="/data/.cache/ms-playwright"
+if [ ! -d "$PLAYWRIGHT_CACHE" ]; then
+    echo "Downloading browser binaries for agent-browser (first boot, ~200MB)..."
+    agent-browser install 2>&1 | tail -10 || echo "Warning: agent-browser install failed, browser automation may not work"
+else
+    echo "Browser binaries already installed, skipping download."
 fi
 
 echo "Starting ZeroClaw daemon..."
