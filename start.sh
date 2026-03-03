@@ -9,7 +9,7 @@ CONFIG_FILE="/data/.zeroclaw/config.toml"
 # Detect corrupted config (bad [agent] block left orphaned TOML array fragments).
 # If found, back up and remove so the clean first-boot path recreates it.
 # Sessions and memory live in separate SQLite files — config.toml is safe to recreate.
-if [ -f "$CONFIG_FILE" ] && grep -qE '^\["web_search"|^\["file_read"' "$CONFIG_FILE"; then
+if [ -f "$CONFIG_FILE" ] && { grep -qE '^\["web_search"|^\["file_read"' "$CONFIG_FILE" || ! grep -q 'cli = true' "$CONFIG_FILE"; }; then
     BACKUP="${CONFIG_FILE}.bak.$(date +%s)"
     cp "$CONFIG_FILE" "$BACKUP"
     rm "$CONFIG_FILE"
@@ -66,6 +66,9 @@ trigger = "keywords"
 keywords = ["search", "find", "cerca", "cerca su", "look up", "what is", "who is", "how is", "when is", "latest", "news"]
 max_iterations = 3
 show_progress = true
+
+[channels_config]
+cli = true
 
 [channels_config.telegram]
 bot_token = "${TELEGRAM_BOT_TOKEN:-}"
