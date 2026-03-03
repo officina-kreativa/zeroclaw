@@ -45,6 +45,18 @@ api_key = "${TAVILY_API_KEY:-}"
 fallback_providers = ["duckduckgo"]
 max_results = 5
 
+[agent]
+agentic = true
+allowed_tools = ["web_search", "file_read", "shell"]
+max_iterations = 5
+
+[research]
+enabled = true
+trigger = "keywords"
+keywords = ["search", "find", "cerca", "cerca su", "look up", "what is", "who is", "how is", "when is", "latest", "news"]
+max_iterations = 3
+show_progress = true
+
 [channels_config.telegram]
 bot_token = "${TELEGRAM_BOT_TOKEN:-}"
 allowed_users = ["vinscyber"]
@@ -108,6 +120,25 @@ fallback_providers = ["duckduckgo"]
 max_results = 5
 TOML
         echo "Web search (tavily) added to config."
+    fi
+
+    # Add [agent] agentic mode if not present
+    if ! grep -q "agentic = true" "$CONFIG_FILE"; then
+        cat >> "$CONFIG_FILE" <<TOML
+
+[agent]
+agentic = true
+allowed_tools = ["web_search", "file_read", "shell"]
+max_iterations = 5
+
+[research]
+enabled = true
+trigger = "keywords"
+keywords = ["search", "find", "cerca", "look up", "what is", "who is", "how is", "when is", "latest", "news"]
+max_iterations = 3
+show_progress = true
+TOML
+        echo "Agentic mode + research phase added to config."
     fi
 
     # Add Telegram config if not present
