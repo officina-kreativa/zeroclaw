@@ -23,6 +23,16 @@ port = 8080
 host = "0.0.0.0"
 allow_public_bind = true
 
+[agent.session]
+backend = "sqlite"
+strategy = "per-sender"
+ttl_seconds = 86400
+max_messages = 100
+
+[memory]
+backend = "sqlite"
+auto_save = true
+
 [skills]
 open_skills_enabled = true
 allow_scripts = false
@@ -46,6 +56,23 @@ else
     if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
         sed -i "s|^bot_token = .*|bot_token = \"${TELEGRAM_BOT_TOKEN}\"|" "$CONFIG_FILE"
     fi
+    # Add [agent.session] config if not present (enables persistent sessions)
+    if ! grep -q "\[agent.session\]" "$CONFIG_FILE"; then
+        cat >> "$CONFIG_FILE" <<TOML
+
+[agent.session]
+backend = "sqlite"
+strategy = "per-sender"
+ttl_seconds = 86400
+max_messages = 100
+
+[memory]
+backend = "sqlite"
+auto_save = true
+TOML
+        echo "Session persistence (sqlite) added to config."
+    fi
+
     # Add [skills] config if not present
     if ! grep -q "\[skills\]" "$CONFIG_FILE"; then
         cat >> "$CONFIG_FILE" <<TOML
