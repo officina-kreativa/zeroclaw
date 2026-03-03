@@ -38,6 +38,13 @@ open_skills_enabled = true
 allow_scripts = false
 prompt_injection_mode = "full"
 
+[web_search]
+enabled = true
+provider = "tavily"
+api_key = "${TAVILY_API_KEY:-}"
+fallback_providers = ["duckduckgo"]
+max_results = 5
+
 [channels_config.telegram]
 bot_token = "${TELEGRAM_BOT_TOKEN:-}"
 allowed_users = ["vinscyber"]
@@ -55,6 +62,10 @@ else
     # Update Telegram bot token from env var if set
     if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
         sed -i "s|^bot_token = .*|bot_token = \"${TELEGRAM_BOT_TOKEN}\"|" "$CONFIG_FILE"
+    fi
+    # Update Tavily API key from env var if set
+    if [ -n "$TAVILY_API_KEY" ]; then
+        sed -i "s|^api_key = \"tvly-.*\"|api_key = \"${TAVILY_API_KEY}\"|" "$CONFIG_FILE"
     fi
     # Add [agent.session] config if not present (enables persistent sessions)
     if ! grep -q "\[agent.session\]" "$CONFIG_FILE"; then
@@ -83,6 +94,20 @@ allow_scripts = false
 prompt_injection_mode = "full"
 TOML
         echo "Skills config added."
+    fi
+
+    # Add [web_search] config if not present
+    if ! grep -q "\[web_search\]" "$CONFIG_FILE"; then
+        cat >> "$CONFIG_FILE" <<TOML
+
+[web_search]
+enabled = true
+provider = "tavily"
+api_key = "${TAVILY_API_KEY:-}"
+fallback_providers = ["duckduckgo"]
+max_results = 5
+TOML
+        echo "Web search (tavily) added to config."
     fi
 
     # Add Telegram config if not present
