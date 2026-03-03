@@ -84,16 +84,16 @@ else
     # Remove the standalone [agent] block (with agentic/allowed_tools/max_iterations)
     # and instead insert those keys before [agent.session] where they belong.
     python3 - <<'PY'
-import re, os
+import re
 
 path = "/data/.zeroclaw/config.toml"
 with open(path) as f:
     content = f.read()
 
-# Remove standalone [agent] block that was incorrectly appended
-# (matches [agent] followed by agentic/allowed_tools/max_iterations lines up to next section)
+# Remove standalone [agent] block incorrectly appended (not [agent.session]).
+# Match lines that do NOT start with [ (so array values like ["x","y"] are included).
 content = re.sub(
-    r'\n\[agent\]\nagentic = true\n[^\[]*',
+    r'\n\[agent\]\n(?:(?!\[)[^\n]*\n)*',
     '\n',
     content
 )
