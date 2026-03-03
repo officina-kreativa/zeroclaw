@@ -6,7 +6,17 @@ mkdir -p /data/.zeroclaw /data/.zeroclaw/logs /data/workspace
 
 CONFIG_FILE="/data/.zeroclaw/config.toml"
 
-# Create default config if not present (first boot)
+# Detect corrupted config (bad [agent] block left orphaned TOML array fragments).
+# If found, back up and remove so the clean first-boot path recreates it.
+# Sessions and memory live in separate SQLite files — config.toml is safe to recreate.
+if [ -f "$CONFIG_FILE" ] && grep -qE '^\["web_search"|^\["file_read"' "$CONFIG_FILE"; then
+    BACKUP="${CONFIG_FILE}.bak.$(date +%s)"
+    cp "$CONFIG_FILE" "$BACKUP"
+    rm "$CONFIG_FILE"
+    echo "Corrupted config detected and backed up to $BACKUP — recreating..."
+fi
+
+# Create default config if not present (first boot or after corruption recovery)
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "Creating default config for Ollama cloud..."
     cat > "$CONFIG_FILE" <<TOML
@@ -77,113 +87,6 @@ else
     fi
     if [ -n "$TAVILY_API_KEY" ]; then
         sed -i "s|^api_key = \"tvly-[^\"]*\"|api_key = \"${TAVILY_API_KEY}\"|" "$CONFIG_FILE"
-    fi
-
-    # Fix duplicate [agent] section caused by earlier upgrade path bug:
-    # [agent.session] implicitly defines [agent], so a second [agent] block is invalid TOML.
-    # Remove the standalone [agent] block (with agentic/allowed_tools/max_iterations)
-    # and instead insert those keys before [agent.session] where they belong.
-    python3 - <<'PY'
-import re
-
-path = "/data/.zeroclaw/config.toml"
-with open(path) as f:
-    content = f.read()
-
-# Remove standalone [agent] block incorrectly appended (not [agent.session]).
-# Match lines that do NOT start with [ (so array values like ["x","y"] are included).
-content = re.sub(
-    r'\n\[agent\]\n(?:(?!\[)[^\n]*\n)*',
-    '\n',
-    content
-)
-
-# Add agentic keys before [agent.session] if not already present
-if 'agentic = true' not in content and '[agent.session]' in content:
-    content = content.replace(
-        '[agent.session]',
-        '[agent]\nagentic = true\nallowed_tools = ["web_search", "file_read", "shell"]\nmax_iterations = 5\n\n[agent.session]'
-    )
-    print("Agentic mode injected before [agent.session].")
-
-with open(path, 'w') as f:
-    f.write(content)
-PY
-
-    # Add [agent.session] if not present
-    if ! grep -q "\[agent.session\]" "$CONFIG_FILE"; then
-        cat >> "$CONFIG_FILE" <<TOML
-
-[agent]
-agentic = true
-allowed_tools = ["web_search", "file_read", "shell"]
-max_iterations = 5
-
-[agent.session]
-backend = "sqlite"
-strategy = "per-sender"
-ttl_seconds = 86400
-max_messages = 100
-
-[memory]
-backend = "sqlite"
-auto_save = true
-TOML
-        echo "Session persistence (sqlite) added to config."
-    fi
-
-    # Add [skills] if not present
-    if ! grep -q "\[skills\]" "$CONFIG_FILE"; then
-        cat >> "$CONFIG_FILE" <<TOML
-
-[skills]
-open_skills_enabled = true
-allow_scripts = false
-prompt_injection_mode = "full"
-TOML
-        echo "Skills config added."
-    fi
-
-    # Add [web_search] if not present
-    if ! grep -q "\[web_search\]" "$CONFIG_FILE"; then
-        cat >> "$CONFIG_FILE" <<TOML
-
-[web_search]
-enabled = true
-provider = "tavily"
-api_key = "${TAVILY_API_KEY:-}"
-fallback_providers = ["duckduckgo"]
-max_results = 5
-TOML
-        echo "Web search (tavily) added to config."
-    fi
-
-    # Add [research] if not present
-    if ! grep -q "\[research\]" "$CONFIG_FILE"; then
-        cat >> "$CONFIG_FILE" <<TOML
-
-[research]
-enabled = true
-trigger = "keywords"
-keywords = ["search", "find", "cerca", "look up", "what is", "who is", "how is", "when is", "latest", "news"]
-max_iterations = 3
-show_progress = true
-TOML
-        echo "Research phase added to config."
-    fi
-
-    # Add Telegram config if not present
-    if ! grep -q "channels_config.telegram" "$CONFIG_FILE"; then
-        cat >> "$CONFIG_FILE" <<TOML
-
-[channels_config.telegram]
-bot_token = "${TELEGRAM_BOT_TOKEN:-}"
-allowed_users = ["vinscyber"]
-
-[[channels]]
-channel_type = "telegram"
-TOML
-        echo "Telegram channel added to config."
     fi
 fi
 
