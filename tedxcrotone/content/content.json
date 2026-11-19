@@ -1,0 +1,213 @@
+{
+  "meta": {
+    "evento": "TEDxCrotone",
+    "titolo": "Nuova umanità",
+    "payoff": "Ridisegnare la mappa.",
+    "fraseChiave": "La distanza non è più un destino.",
+    "domanda": "Quale mappa stai ridisegnando?",
+    "chiusuraSessione": "E da qui, cosa cambia?",
+    "data": "Data da definire",
+    "sede": "Sede da definire",
+    "luogo": "Crotone",
+    "logo": "Spazio per il logo ufficiale",
+    "documento": "Proposta di tema per la prossima edizione",
+    "destinatari": "Documento per i soci organizzatori"
+  },
+  "idea": {
+    "sezione": "L'idea",
+    "titolo": "Il mondo cambia forma.\nNoi lo raccontiamo da qui.",
+    "intro": "Sposta il centro, e il mondo cambia forma. È la stessa Terra, con gli stessi dati. Cambia solo il punto da cui la guardi.",
+    "blocchi": [
+      {
+        "titolo": "Perché adesso",
+        "testo": "Tre cose si muovono insieme. I confini tornano a tremare. La ricchezza cambia strada. E l'intelligenza artificiale arriva in ogni casa nello stesso giorno. Quando si spostano insieme potere, soldi e strumenti, la mappa vecchia non regge più. Capita di rado. Sta capitando ora."
+      },
+      {
+        "titolo": "Perché da Crotone",
+        "testo": "Perché nessuno se lo aspetta. Qui la mappa vecchia l'hai imparata in stazione, guardando partire qualcuno. Diceva che la vita vera era altrove. Se quella mappa cade, da qui si vede prima. Raccontare il mondo dal punto più lontano è il modo più onesto di misurare quanto è cambiato."
+      },
+      {
+        "titolo": "Perché funziona",
+        "testo": "Un tema, quattro mappe, una domanda uguale per tutti: quale mappa stai ridisegnando? Chi sale sul palco sa cosa portare. Chi ascolta sa cosa cercare. E l'immagine si spiega da sola, su un manifesto come su uno schermo."
+      }
+    ],
+    "centri": {
+      "nota": "Stessi dati, tre centri. Proiezione azimutale equidistante.",
+      "voci": [
+        { "nome": "San Francisco", "lon": -122.42, "lat": 37.77 },
+        { "nome": "Pechino", "lon": 116.4, "lat": 39.9 },
+        { "nome": "Crotone", "lon": 17.12, "lat": 39.08 }
+      ]
+    }
+  },
+  "mappe": {
+    "sezione": "Le quattro mappe",
+    "titolo": "Quattro sessioni.\nQuattro tavole della stessa serie.",
+    "nota": "Ogni tavola ha lo stesso disco, la stessa ghiera, lo stesso punto rosso. Cambia quello che ci passa attraverso.",
+    "voci": [
+      {
+        "id": "potere",
+        "n": "01",
+        "titolo": "La mappa del potere",
+        "titoloBreve": "La mappa\ndel potere",
+        "domanda": "Chi decide dove passa il confine?",
+        "temi": "Tensioni, nuovi blocchi, alleanze che si spostano.",
+        "tavola": "La stessa carta stampata tre volte, fuori registro. I confini non stanno fermi.",
+        "voci": "Da coprire. Ipotesi: Laura Canali."
+      },
+      {
+        "id": "ricchezza",
+        "n": "02",
+        "titolo": "La mappa della ricchezza",
+        "titoloBreve": "La mappa\ndella ricchezza",
+        "domanda": "Dove si crea valore, e chi resta fuori?",
+        "temi": "Equilibri economici, lavoro, territori che salgono e che scendono.",
+        "tavola": "Archi di cerchio massimo tra le città. Gli spessori sono illustrativi: non sono dati.",
+        "voci": "Elena Militello."
+      },
+      {
+        "id": "intelligenza",
+        "n": "03",
+        "titolo": "La mappa dell'intelligenza",
+        "titoloBreve": "La mappa\ndell'intelligenza",
+        "domanda": "Cosa può fare, oggi, una persona sola?",
+        "temi": "L'intelligenza artificiale che arriva ovunque nello stesso istante.",
+        "tavola": "Punti alla stessa distanza dal centro, su una griglia che si piega.",
+        "voci": "Gianluigi Greco, Massimo Ruffolo."
+      },
+      {
+        "id": "umano",
+        "n": "04",
+        "titolo": "La mappa dell'umano",
+        "titoloBreve": "La mappa\ndell'umano",
+        "domanda": "Cosa resta nostro, e cosa diventiamo?",
+        "temi": "Tempo, creatività, relazioni, limiti che non vogliamo delegare.",
+        "tavola": "Isolinee attorno a un punto. Un'impronta. Gli anelli di un albero.",
+        "voci": "Brunori Sas."
+      }
+    ]
+  },
+  "manifesto": {
+    "sezione": "Manifesto",
+    "titolo": "Manifesto",
+    "paragrafi": [
+      "C'è una mappa che conosciamo a memoria, anche se nessuno ce l'ha mai mostrata.",
+      "L'abbiamo imparata nelle stazioni, guardando partire qualcuno che amavamo. Diceva che la vita vera era altrove.",
+      "Oggi quella mappa non regge più. I confini tremano, la ricchezza cambia strada, e lo strumento più potente del nostro tempo arriva ovunque nello stesso istante: a Crotone come a San Francisco.",
+      "È questo che chiamiamo cambio d'epoca: il giorno in cui la distanza smette di essere un destino.",
+      "Crediamo che il centro non sia un punto sulla carta. È il luogo in cui qualcuno si innamora di un'idea e decide di non lasciarla andare.",
+      "Crediamo che restare sia un atto d'amore, e che tornare sia un atto di coraggio.",
+      "Crediamo che da qui possa nascere una nuova umanità. Non più veloce: più libera.",
+      "Niente di tutto questo è promesso. Il futuro non arriva: si disegna. E se non lo disegniamo noi lo farà qualcun altro.",
+      "Il centro del mondo è dove qualcuno decide di cominciare. E noi cominciamo da qui."
+    ]
+  },
+  "identita": {
+    "sezione": "L'identità",
+    "kv": {
+      "titolo": "Il key visual:\nil mondo a cerchi",
+      "testo": "Il planisfero è riproiettato con Crotone al centro. Poi togliamo le coste e lasciamo solo i cerchi di distanza: dove un cerchio tocca terra, si accende. Il mondo intero è disegnato dalla distanza da un punto.",
+      "punti": [
+        "Dati veri: Natural Earth, proiezione azimutale equidistante su 39.08° N, 17.12° E.",
+        "Un cerchio ogni 250 km. Fino agli antipodi: 20 000 km.",
+        "Tutto vettoriale, generato da codice, riproducibile con un seed."
+      ],
+      "varianti": ["Su carta", "Variante: Il centro", "Variante: Sud in alto"]
+    },
+    "sistema": {
+      "titolo": "Il sistema grafico",
+      "colori": [
+        { "nome": "Nero", "hex": "#0B0B0C", "uso": "Fondo principale" },
+        { "nome": "Carta", "hex": "#F3EFE6", "uso": "Fondo chiaro, linee su nero" },
+        { "nome": "Rosso", "hex": "#E62B1E", "uso": "Un solo elemento per tavola" },
+        { "nome": "Grafite", "hex": "#8A867C", "uso": "Note, griglie, didascalie" }
+      ],
+      "caratteri": [
+        { "nome": "Archivo Black", "ruolo": "Titoli", "classe": "display", "prova": "NUOVA UMANITÀ" },
+        { "nome": "Instrument Serif corsivo", "ruolo": "Payoff e manifesto", "classe": "serif", "prova": "Ridisegnare la mappa." },
+        { "nome": "Inter", "ruolo": "Testi e didascalie", "classe": "sans", "prova": "La distanza non è più un destino." }
+      ],
+      "regole": [
+        { "titolo": "Il rosso", "testo": "Si usa poco. Un solo elemento per tavola: il punto. Sul palco, il tappeto." },
+        { "titolo": "La linea", "testo": "Sottile, sempre. Lo spessore cambia solo quando porta un significato." },
+        { "titolo": "Il vuoto", "testo": "Molto spazio attorno al disco. La mappa respira, il testo sta ai margini." },
+        { "titolo": "La carta", "testo": "Grana leggera su ogni fondo. Deve sembrare stampato, non proiettato." }
+      ],
+      "tono": {
+        "titolo": "Il tono",
+        "testo": "Frasi brevi. Dai del tu. Immagini che si toccano: una stazione, un porto, una vigna. Niente gergo, niente lamento.",
+        "si": ["La distanza non è più un destino.", "Il futuro non arriva: si disegna."],
+        "no": ["Abilitare ecosistemi di innovazione sul territorio.", "Una terra dimenticata da tutti."]
+      }
+    }
+  },
+  "applicazioni": {
+    "sezione": "Applicazioni",
+    "manifesti": { "titolo": "Manifesto 50×70", "nota": "Due varianti: su nero con il key visual, su carta con la frase chiave.", "frase": "La distanza\nnon è più\nun destino." },
+    "social": {
+      "titolo": "Social",
+      "nota": "Post quadrato, storia verticale, copertina evento. Una frase del manifesto per volta.",
+      "post": "Il futuro\nnon arriva:\nsi disegna.",
+      "storia": "Crediamo che\nrestare sia\nun atto d'amore,\ne che tornare\nsia un atto\ndi coraggio.",
+      "copertina": "Il centro del mondo\nè dove qualcuno decide\ndi cominciare."
+    },
+    "palco": { "titolo": "Fondale del palco", "nota": "Il disco sul fondale non ha il punto rosso. Il punto è il tappeto: chi parla sta al centro della mappa." },
+    "badge": { "titolo": "Badge speaker e pass staff", "nota": "Stesso disegno, fondi invertiti. Nome grande, ruolo, sessione.", "nome": "Nome Cognome", "speaker": "Speaker", "staff": "Staff", "ruoloStaff": "Accoglienza" },
+    "slide": { "titolo": "Slide di apertura delle sessioni", "nota": "Una per sessione: numero, titolo, domanda, tavola." }
+  },
+  "speaker": {
+    "sezione": "Le voci",
+    "titolo": "Quattro voci, più una da trovare",
+    "nota": "I titoli dei talk sono proposte nostre, da concordare con ogni speaker.",
+    "voci": [
+      {
+        "nome": "Gianluigi Greco",
+        "mappa": "La mappa dell'intelligenza",
+        "bio": "Rettore dell'Università della Calabria (2025-2031), ordinario di Informatica. Già presidente dell'Associazione Italiana per l'Intelligenza Artificiale, coordina il comitato che aggiorna la strategia nazionale sull'IA.",
+        "talk": "Chi scrive le regole dell'intelligenza, e da dove."
+      },
+      {
+        "nome": "Massimo Ruffolo",
+        "mappa": "La mappa dell'intelligenza",
+        "bio": "Fondatore e CEO di Altilia, azienda deep-tech di AI nata a Cosenza come spin-off dell'ICAR-CNR.",
+        "talk": "Costruire AI lontano dai soliti centri."
+      },
+      {
+        "nome": "Elena Militello",
+        "mappa": "La mappa della ricchezza",
+        "bio": "Giurista palermitana, presidente di South Working – Lavorare dal Sud. Rientrata in Sicilia dal Lussemburgo nel 2020. Ha già un talk a TEDxCataniaStudio (2021): le chiediamo il capitolo successivo.",
+        "talk": "Dopo l'onda: cosa è rimasto del lavoro dal Sud."
+      },
+      {
+        "nome": "Brunori Sas",
+        "mappa": "La mappa dell'umano",
+        "bio": "Dario Brunori, cantautore, vive a San Fili (Cosenza). A Sanremo 2025 con \"L'albero delle noci\".",
+        "talk": "Restare senza restare fermi.",
+        "extra": "Con un brano."
+      }
+    ],
+    "daCoprire": {
+      "etichetta": "Da coprire",
+      "mappa": "La mappa del potere",
+      "testo": "Manca la voce che apre la giornata. Ipotesi: Laura Canali, cartografa di Limes dal 1993.",
+      "nota": "Chi disegna le carte, a raccontare chi sposta i confini."
+    }
+  },
+  "decisioni": {
+    "sezione": "Decisioni",
+    "titolo": "Quattro decisioni per i soci",
+    "voci": [
+      { "titolo": "Approvare tema e payoff", "testo": "«Nuova umanità. Ridisegnare la mappa.» Sì, no, o sì con modifiche." },
+      { "titolo": "Via libera agli inviti", "testo": "Ai quattro nomi proposti. I titoli dei talk si concordano con loro." },
+      { "titolo": "Scegliere la quinta voce", "testo": "La mappa del potere è scoperta. Ipotesi: Laura Canali. Altri nomi sono benvenuti." },
+      { "titolo": "Definire data e sede", "testo": "Oggi: da definire. Servono prima di spedire il primo invito." }
+    ],
+    "attenzioni": {
+      "titolo": "Due attenzioni",
+      "voci": [
+        "Gli speaker TEDx non sono pagati. Va detto subito, in ogni invito.",
+        "Su geopolitica ed economia chiediamo analisi e idee, non posizioni di parte."
+      ]
+    }
+  }
+}
